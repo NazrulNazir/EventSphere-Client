@@ -80,7 +80,7 @@ export function AppSidebar() {
 
           <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden">
             <span className="font-display text-base font-semibold text-sidebar-foreground">
-              Evently
+              Event<span className="text-primary">Sphere</span>
             </span>
 
             <span className="text-[10px] uppercase tracking-widest text-muted-foreground">

@@ -4,9 +4,10 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useState,
-  type ReactNode,
   type Dispatch,
+  type ReactNode,
   type SetStateAction,
 } from "react";
 
@@ -22,40 +23,44 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 const STORAGE_KEY = "evently-theme";
 
+function getStoredTheme(): Theme {
+  if (typeof window === "undefined") {
+    return "dark";
+  }
+
+  const stored = window.localStorage.getItem(STORAGE_KEY);
+  return stored === "light" || stored === "dark" ? stored : "dark";
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>("dark");
-  const [isMounted, setIsMounted] = useState(false);
 
-  // Read saved theme from localStorage after hydration.
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    const nextTheme = stored === "light" || stored === "dark" ? stored : "dark";
-
-    setTheme(nextTheme);
-    setIsMounted(true);
+    const storedTheme = getStoredTheme();
+    setTheme(storedTheme);
   }, []);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
-    if (isMounted) {
-      localStorage.setItem(STORAGE_KEY, theme);
-    }
-  }, [theme, isMounted]);
+    document.documentElement.style.colorScheme = theme;
+    window.localStorage.setItem(STORAGE_KEY, theme);
+  }, [theme]);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   };
 
+  const value = useMemo<ThemeContextValue>(
+    () => ({
+      theme,
+      setTheme,
+      toggleTheme,
+    }),
+    [theme],
+  );
+
   return (
-    <ThemeContext.Provider
-      value={{
-        theme,
-        setTheme,
-        toggleTheme,
-      }}
-    >
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
 }
 

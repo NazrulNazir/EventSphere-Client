@@ -1,15 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Bell,
-  Search,
-  Moon,
-  Sun,
-  User,
-  Settings,
-  LogOut,
-} from "lucide-react";
+import { Bell, Search, Moon, Sun, User, Settings, LogOut } from "lucide-react";
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
@@ -30,10 +22,10 @@ export function TopNavbar() {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border/60 bg-background/80 px-4 backdrop-blur-xl md:px-6">
+    <header className="sticky top-0 z-30 flex justify-between h-16 w-full min-w-0 items-center gap-3 border-b border-border/60 bg-background/80 px-4 backdrop-blur-xl md:px-6">
       <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
 
-      <div className="relative ml-2 hidden max-w-md flex-1 sm:block">
+      <div className="relative ml-2 hidden max-w-md flex-1 min-w-0 sm:block">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 
         <Input
@@ -56,7 +48,9 @@ export function TopNavbar() {
             <Moon className="h-4 w-4" />
           )}
         </Button>
-        <p>{theme}</p>
+        <span className="hidden sm:inline text-sm font-medium text-muted-foreground">
+          {theme === "dark" ? "Dark" : "Light"}
+        </span>
 
         <Button
           variant="ghost"
@@ -85,9 +79,7 @@ export function TopNavbar() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>
               <div className="flex flex-col">
-                <span className="text-sm font-semibold">
-                  Alexandra Chen
-                </span>
+                <span className="text-sm font-semibold">Alexandra Chen</span>
                 <span className="text-xs font-normal text-muted-foreground">
                   alex@evently.io
                 </span>
