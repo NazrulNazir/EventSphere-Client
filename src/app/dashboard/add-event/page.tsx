@@ -95,7 +95,7 @@ function AddEventPage() {
     };
 
     try {
-      const res = await fetch(`${process.env.BETTER_AUTH_URL}/events`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/events`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

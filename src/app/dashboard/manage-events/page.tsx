@@ -247,7 +247,7 @@ export default function ManageEventsPage() {
 
                 try {
                   const res = await fetch(
-                    `${process.env.BETTER_AUTH_URL}/dashboard/events/${deleteId}`,
+                    `${process.env.NEXT_PUBLIC_SERVER_URL}/dashboard/events/${deleteId}`,
                     {
                       method: "DELETE",
                     },

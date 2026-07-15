@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from "next/cache";
+// import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { auth } from "./auth";
 
@@ -16,7 +16,7 @@ export const  getEvent = async (email: string)=>{
   const { token } = await auth.api.getToken({
     headers: await headers(),
   });
-    const res = await fetch(`${process.env.BETTER_AUTH_URL}/dashboard/my-events/${email}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/dashboard/my-events/${email}`, {
        cache: "no-store",
       headers: {
         authorization: `Bearer ${token}`,
@@ -25,7 +25,7 @@ export const  getEvent = async (email: string)=>{
     return res.json();
 }
 export const  getAllEvent = async ()=>{
-    const res = await fetch(`${process.env.BETTER_AUTH_URL}/all-events`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/all-events`);
     return res.json();
 }
 
@@ -34,7 +34,7 @@ export const getSingleEvent = async (id: string | number) => {
   const { token } = await auth.api.getToken({
     headers: await headers(),
   });
-  const res = await fetch(`${process.env.BETTER_AUTH_URL}/my-event/${id}`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/my-event/${id}`, {
       cache: "no-store",
       headers: {
         authorization: `Bearer ${token}`,
