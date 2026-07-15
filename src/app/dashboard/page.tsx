@@ -40,6 +40,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useState } from "react";
+import Link from "next/link";
 
 // export const Route = createFileRoute("/")({
 //   component: DashboardPage,
@@ -179,9 +180,11 @@ function DashboardPage() {
               month
             </p>
           </div>
-          <Button className="h-10 rounded-full bg-primary px-5 text-primary-foreground glow-primary hover:bg-primary/90">
+          <Link href={'/dashboard/add-event'}>
+            <Button className="h-10 rounded-full bg-primary px-5 text-primary-foreground glow-primary hover:bg-primary/90">
             <Plus className="mr-2 h-4 w-4" /> Create Event
           </Button>
+          </Link>
         </div>
 
         {/* Stats */}

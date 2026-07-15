@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   CalendarDays,
@@ -26,6 +26,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { signOut } from "@/lib/auth-client";
+import toast from "react-hot-toast";
 
 const nav = [
   {
@@ -69,6 +71,8 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   const isActive = (path: string) => pathname === path;
+
+  const router = useRouter();
 
   return (
     <Sidebar collapsible="icon" className="border-r border-sidebar-border">
@@ -127,9 +131,19 @@ export function AppSidebar() {
       <SidebarFooter className="px-2 pb-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton className="h-10 rounded-lg text-muted-foreground hover:text-foreground">
-              <LogOut className="h-4 w-4" />
-              <span>Logout</span>
+            <SidebarMenuButton className="h-10 rounded-lg text-muted-foreground hover:text-foreground"
+                  onClick={async () => {
+                    await signOut();
+
+                    toast.success("Logout successfully.");
+
+                    router.push("/");
+                    router.refresh();
+                  }}
+                  // className="text-destructive focus:text-destructive"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Log out
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -137,3 +151,6 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
+
+
+

@@ -1,10 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, MapPin, Ticket, Plus } from "lucide-react";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
-import { getEvent } from "@/lib/api";
+import { CalendarDays, MapPin, Ticket} from "lucide-react";
+// import { headers } from "next/headers";
+// import { auth } from "@/lib/auth";
+import { getAllEvent } from "@/lib/api";
 import Link from "next/link";
 
 interface Event {
@@ -45,31 +45,26 @@ const getStatus = (date: string) => {
   return "Completed";
 };
 
-const MyEventsPage = async () => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+const AllEventsPages = async () => {
+  // const session = await auth.api.getSession({
+  //   headers: await headers(),
+  // });
 
-  const email = session?.user?.email;
+  // const email = session?.user?.email;
 
-  const events: Event[] = email ? await getEvent(email) : [];
+  const events: Event[] = await getAllEvent();
 
   return (
     <div className="w-full min-w-0 p-4 md:p-6">
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl font-semibold">My Events</h1>
+          <h1 className="font-display text-3xl font-semibold">All Events</h1>
 
           <p className="mt-1 text-sm text-muted-foreground">
             Everything you&apos;re hosting. {events.length} total events.
           </p>
         </div>
-
-        <Button className="h-10 rounded-full">
-          <Plus className="mr-2 h-4 w-4" />
-          New Event
-        </Button>
       </div>
 
       {/* Empty State */}
@@ -131,22 +126,15 @@ const MyEventsPage = async () => {
 
                     <span>/ {Number(e.capacity).toLocaleString()} booked</span>
                   </div>
-                  <div className="mt-5 flex gap-2">
+                  <div className="mt-5 flex gap-2 justify-between">
+                    <div></div>
                    <div className="">
-                     <Link href={`/dashboard/my-events/details/${e._id}`}>
+                     <Link href={`/all-events/${e._id}`}>
                       <Button variant="secondary" size="sm" className="flex-1">
-                        View
+                        Details
                       </Button>
                     </Link>
                    </div>
-
-                    <div className="">
-                      <Link href={`/dashboard/my-events/${e._id}`}>
-                      <Button variant="outline" size="sm" className="flex-1">
-                        Edit
-                      </Button>
-                    </Link>
-                    </div>
                   </div>
                 </div>
               </Card>
@@ -158,4 +146,4 @@ const MyEventsPage = async () => {
   );
 };
 
-export default MyEventsPage;
+export default AllEventsPages;

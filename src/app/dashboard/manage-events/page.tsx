@@ -1,9 +1,17 @@
 "use client";
-import { useState } from "react";
+
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
+import { Search, Pencil, Trash2 } from "lucide-react";
+
+import { useSession } from "@/lib/auth-client";
+import { getEvent } from "@/lib/api";
+
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,6 +22,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+
 import {
   Table,
   TableBody,
@@ -22,229 +31,244 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Pencil, Trash2 } from "lucide-react";
-import { toast } from "sonner";
 
-type EventRow = {
-  id: string;
+interface Event {
+  _id: string;
   name: string;
-  date: string;
   category: string;
+  venue: string;
+  date: string;
+  time: string;
+  description: string;
+  capacity: number;
   bookings: number;
-  status: "Live" | "Scheduled" | "Completed" | "Draft";
+  price: number;
+  email: string;
+}
+
+const statusColor: Record<string, string> = {
+  Live: "bg-green-500/15 text-green-600",
+  Scheduled: "bg-yellow-500/15 text-yellow-600",
+  Completed: "bg-blue-500/15 text-blue-600",
 };
 
-const initial: EventRow[] = [
-  {
-    id: "e1",
-    name: "Neon Frequencies Fest",
-    date: "Jun 28",
-    category: "Music",
-    bookings: 1248,
-    status: "Live",
-  },
-  {
-    id: "e2",
-    name: "Future of Work Summit",
-    date: "Jul 3",
-    category: "Business",
-    bookings: 842,
-    status: "Completed",
-  },
-  {
-    id: "e3",
-    name: "Urban Marathon Series",
-    date: "Jul 8",
-    category: "Sports",
-    bookings: 3120,
-    status: "Live",
-  },
-  {
-    id: "e4",
-    name: "Modern Canvas Expo",
-    date: "Jul 12",
-    category: "Arts",
-    bookings: 512,
-    status: "Scheduled",
-  },
-  {
-    id: "e5",
-    name: "AI & Robotics Expo",
-    date: "Jul 18",
-    category: "Technology",
-    bookings: 1904,
-    status: "Scheduled",
-  },
-  {
-    id: "e6",
-    name: "Coastal Jazz Weekend",
-    date: "Jul 24",
-    category: "Music",
-    bookings: 612,
-    status: "Scheduled",
-  },
-  {
-    id: "e7",
-    name: "Indie Film Nights",
-    date: "Aug 2",
-    category: "Arts",
-    bookings: 0,
-    status: "Draft",
-  },
-];
+const getStatus = (date: string) => {
+  const eventDate = new Date(date);
+  const today = new Date();
 
-const statusColor: Record<EventRow["status"], string> = {
-  Live: "bg-success/15 text-success",
-  Scheduled: "bg-warning/15 text-warning",
-  Completed: "bg-info/15 text-info",
-  Draft: "bg-muted text-muted-foreground",
+  eventDate.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+
+  if (eventDate.getTime() === today.getTime()) {
+    return "Live";
+  }
+
+  if (eventDate > today) {
+    return "Scheduled";
+  }
+
+  return "Completed";
 };
 
-function ManageEventsPage() {
-  const [rows, setRows] = useState(initial);
-  const [q, setQ] = useState("");
+export default function ManageEventsPage() {
+  const { data } = useSession();
+
+  const email = data?.user?.email;
+
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [search, setSearch] = useState("");
+
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const filtered = rows.filter((r) =>
-    r.name.toLowerCase().includes(q.toLowerCase()),
-  );
+  useEffect(() => {
+    if (!email) return;
 
-  const pendingRow = deleteId ? rows.find((r) => r.id === deleteId) : null;
+    const loadEvents = async () => {
+      try {
+        const result = await getEvent(email);
 
-  const confirmRemove = () => {
-    if (!deleteId) return;
-    const name = rows.find((r) => r.id === deleteId)?.name;
-    setRows((r) => r.filter((x) => x.id !== deleteId));
-    setDeleteId(null);
-    toast.success(name ? `"${name}" deleted` : "Event deleted");
-  };
+        setEvents(result);
+      } catch (err) {
+        console.log(err);
+        toast.error("Failed to load events");
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    loadEvents();
+  }, [email]);
+
+  const filteredEvents = useMemo(() => {
+    return events.filter((event) =>
+      event.name.toLowerCase().includes(search.toLowerCase()),
+    );
+  }, [events, search]);
+
+  const pendingEvent = events.find((e) => e._id === deleteId);
   return (
     <div className="w-full min-w-0 p-4 md:p-6">
+      {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="font-display text-3xl font-semibold">Manage Events</h1>
+
           <p className="mt-1 text-sm text-muted-foreground">
-            Edit, delete or update statuses.
+            Edit or delete your created events.
           </p>
         </div>
+
         <div className="relative w-full sm:w-72">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+
           <Input
-            placeholder="Search events…"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search events..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             className="h-10 rounded-full pl-10"
           />
         </div>
       </div>
 
-      <Card className="surface-gradient mt-6 w-full border-border/60 p-4">
-        <div className="w-full overflow-x-auto">
-          <Table className="w-full">
+      <Card className="surface-gradient mt-6 border-border/60 p-4">
+        <div className="overflow-x-auto">
+          <Table>
             <TableHeader>
-              <TableRow className="border-border/60 hover:bg-transparent">
-                <TableHead className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                  Event
-                </TableHead>
-                <TableHead className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                  Date
-                </TableHead>
-                <TableHead className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                  Category
-                </TableHead>
-                <TableHead className="text-right text-[11px] uppercase tracking-wider text-muted-foreground">
-                  Bookings
-                </TableHead>
-                <TableHead className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                  Status
-                </TableHead>
-                <TableHead className="text-right text-[11px] uppercase tracking-wider text-muted-foreground">
-                  Actions
-                </TableHead>
+              <TableRow>
+                <TableHead>Event</TableHead>
+
+                <TableHead>Date</TableHead>
+
+                <TableHead>Category</TableHead>
+
+                <TableHead className="text-right">Bookings</TableHead>
+
+                <TableHead>Status</TableHead>
+
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
+
             <TableBody>
-              {filtered.map((r) => (
-                <TableRow
-                  key={r.id}
-                  className="border-border/40 hover:bg-muted/30"
-                >
-                  <TableCell className="font-medium text-foreground">
-                    {r.name}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {r.date}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {r.category}
-                  </TableCell>
-                  <TableCell className="text-right text-foreground">
-                    {r.bookings.toLocaleString()}
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={`rounded-full ${statusColor[r.status]}`}>
-                      {r.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="inline-flex gap-1">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => toast.info(`Editing ${r.name}`)}
-                        aria-label="Edit"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => setDeleteId(r.id)}
-                        aria-label="Delete"
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {filtered.length === 0 && (
+              {loading ? (
                 <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="py-8 text-center text-sm text-muted-foreground"
-                  >
-                    No events match "{q}".
+                  <TableCell colSpan={6} className="py-10 text-center">
+                    Loading events...
                   </TableCell>
                 </TableRow>
+              ) : filteredEvents.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="py-10 text-center">
+                    No events found.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredEvents.map((event) => {
+                  const status = getStatus(event.date);
+
+                  return (
+                    <TableRow key={event._id} className="hover:bg-muted/30">
+                      <TableCell className="font-medium">
+                        {event.name}
+                      </TableCell>
+
+                      <TableCell>{event.date}</TableCell>
+
+                      <TableCell>{event.category}</TableCell>
+
+                      <TableCell className="text-right">
+                        {(event.bookings ?? 0).toLocaleString()}
+                      </TableCell>
+
+                      <TableCell>
+                        <Badge
+                          className={`rounded-full ${statusColor[status]}`}
+                        >
+                          {status}
+                        </Badge>
+                      </TableCell>
+
+                      <TableCell className="text-right">
+                        <div className="inline-flex gap-1">
+                          {/* <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() =>
+                              toast.info("Edit feature coming soon")
+                            }
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button> */}
+
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="text-red-500 hover:text-red-600"
+                            onClick={() => setDeleteId(event._id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>
         </div>
       </Card>
-
       <AlertDialog
         open={!!deleteId}
-        onOpenChange={(open) => !open && setDeleteId(null)}
+        onOpenChange={(open) => {
+          if (!open) setDeleteId(null);
+        }}
       >
-        <AlertDialogContent className="border-border/60 bg-background">
+        <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete event?</AlertDialogTitle>
+            <AlertDialogTitle>Delete Event?</AlertDialogTitle>
+
             <AlertDialogDescription>
-              {pendingRow
-                ? `This will permanently remove "${pendingRow.name}". This action cannot be undone.`
+              {pendingEvent
+                ? `Are you sure you want to delete "${pendingEvent.name}"?`
                 : "This action cannot be undone."}
             </AlertDialogDescription>
           </AlertDialogHeader>
+
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setDeleteId(null)}>
-              Cancel
-            </AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+
             <AlertDialogAction
-              onClick={confirmRemove}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-red-600 hover:bg-red-700"
+              onClick={async () => {
+                if (!deleteId) return;
+
+                try {
+                  const res = await fetch(
+                    `http://localhost:5000/dashboard/events/${deleteId}`,
+                    {
+                      method: "DELETE",
+                    },
+                  );
+
+                  const result = await res.json();
+
+                  if (result.deletedCount) {
+                    setEvents((prev) => prev.filter((e) => e._id !== deleteId));
+
+                    toast.success("Event deleted successfully");
+                  } else {
+                    toast.error("Delete failed");
+                  }
+                } catch (error) {
+                  console.log(error);
+                  toast.error("Something went wrong");
+                } finally {
+                  setDeleteId(null);
+                }
+              }}
             >
               Delete
             </AlertDialogAction>
@@ -254,5 +278,3 @@ function ManageEventsPage() {
     </div>
   );
 }
-
-export default ManageEventsPage;

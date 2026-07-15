@@ -4,6 +4,9 @@ import "./globals.css";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { TopNavbar } from "@/components/homePage/Navbar";
+import { Toaster } from "react-hot-toast";
+import Footer from "@/components/homePage/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,7 +39,14 @@ export default function RootLayout({
         className="min-h-screen overflow-x-hidden bg-background text-foreground"
       >
         <ThemeProvider>
-          <SidebarProvider>{children}</SidebarProvider>
+          <SidebarProvider>
+            <div className="w-full">
+              <TopNavbar/>
+              <main className="">{children}</main>
+              <Toaster position="top-right" reverseOrder={false} />
+              <Footer/>
+            </div>
+          </SidebarProvider>
         </ThemeProvider>
       </body>
     </html>

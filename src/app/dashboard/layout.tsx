@@ -10,14 +10,14 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen w-full overflow-hidden bg-background">
-      <div className="flex min-h-screen flex-1 bg-background">
+    <div className="flex h-screen w-full overflow-hidden bg-background">
+      <div className="flex h-screen flex-1 bg-background">
         <AppSidebar />
 
-        <SidebarInset className="flex min-h-screen w-full min-w-0 flex-1 flex-col bg-background">
+        <SidebarInset className="flex h-screen w-full min-w-0 flex-1 flex-col overflow-hidden bg-background">
           <TopNavbar />
 
-          <section className="flex-1 min-w-0 overflow-x-hidden p-6">
+          <section className="flex-1 min-h-0 min-w-0 overflow-y-auto p-6">
             {children}
           </section>
         </SidebarInset>
