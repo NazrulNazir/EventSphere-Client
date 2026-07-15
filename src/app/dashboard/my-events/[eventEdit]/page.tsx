@@ -79,7 +79,7 @@ function UpdateEventPage() {
 
   try {
     const res = await fetch(
-      `http://localhost:5000/my-event/${eventEdit}`,
+      `${process.env.BETTER_AUTH_URL}/my-event/${eventEdit}`,
       {
         method: "PATCH",
         headers: {
