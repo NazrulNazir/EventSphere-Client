@@ -90,7 +90,7 @@ function UpdateEventPage() {
     );
 
     const result = await res.json();
-    console.log('result', result)
+    console.log('result......', result)
 
     if (result.modifiedCount > 0) {
       toast.success("Event updated successfully!");
@@ -269,10 +269,10 @@ function UpdateEventPage() {
           </div>
 
           <div className="md:col-span-2 flex justify-end">
-            <Button type="submit" disabled={loading}>
+            <Button type="submit">
               <Plus className="mr-2 h-4 w-4" />
 
-              {loading ? "Updating..." : "Update Event"}
+              Update Event
             </Button>
           </div>
         </form>
