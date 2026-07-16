@@ -59,8 +59,11 @@ export function TopNavbar() {
             </Button>
           </SheetTrigger>
 
+          
+
           <SheetContent side="left" className="w-72">
-            <div className="mt-8 flex flex-col gap-5">
+          <div className="text-xl font-bold flex items-start -mt-2 cursor-pointer">Event<span className="text-primary">Sphere</span></div>
+            <div className="mt-7 flex flex-col gap-5">
               <Link
                 href="/"
                 className={`text-lg font-medium hover:bg-secondary hover:text-white px-3 py-1.5 rounded-md ${

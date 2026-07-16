@@ -7,7 +7,7 @@ function Hero() {
   const [search, setSearch] = useState("");
 
   return (
-    <section className="relative min-h-screen flex items-center pt-16 overflow-hidden">
+    <section className="relative min-h-screen flex items-center sm:pt-16 overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(124,58,237,0.18),transparent)]" />
       <div
         className="absolute inset-0 opacity-30"
