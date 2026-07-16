@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
 import toast from "react-hot-toast";
+import SigninGoogle from "../homePage/SigninWithGoogle";
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -155,10 +156,7 @@ export function LoginForm() {
           </div>
 
           {/* Google */}
-          <Button type="button" variant="outline" className="h-11 w-full">
-            <FcGoogle className="mr-2 h-5 w-5" />
-            Continue with Google
-          </Button>
+          <SigninGoogle/>
 
           {/* Register */}
           <p className="text-center text-sm text-muted-foreground">

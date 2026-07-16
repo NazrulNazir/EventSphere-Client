@@ -21,6 +21,13 @@ export const auth = betterAuth({
     enabled: true,
   },
 
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    },
+  },
+
   user: {
     changeEmail: {
       enabled: true,
@@ -34,25 +41,9 @@ export const auth = betterAuth({
         defaultValue: "active",
       },
       image: {
-        type: 'string',
-        required: false
+        type: "string",
+        required: false,
       },
-
-      // district: {
-      //   type: "string",
-      //   required: false,
-      // },
-
-      // upazila: {
-      //   type: "string",
-      //   required: false,
-      // },
-
-      // role: {
-      //   type: "string",
-      //   required: false,
-      //   defaultValue: "user",
-      // },
     },
   },
 

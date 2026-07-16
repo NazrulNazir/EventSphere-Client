@@ -24,6 +24,7 @@ import { authClient } from "@/lib/auth-client";
 // import { Router } from "next/router";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import SigninGoogle from "../homePage/SigninWithGoogle";
 
 // import { Checkbox } from "@/components/ui/checkbox";
 // import { PasswordStrength } from "./password-strength";
@@ -322,10 +323,8 @@ export function RegisterForm() {
               </span>
             </div>
           </div>
-          <Button type="button" variant="outline" className="h-11 w-full">
-            <FcGoogle className="mr-2 h-5 w-5" />
-            Continue with Google
-          </Button>
+          {/* Social Signin google  */}
+          <SigninGoogle/>
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
             <Link
