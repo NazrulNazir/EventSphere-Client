@@ -20,6 +20,7 @@ import { useTheme } from "./theme-provider";
 import { signOut, useSession } from "@/lib/auth-client";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { RiHomeGearLine } from "react-icons/ri";
 // import { useTheme } from "@/components/theme-provider";
 
 export function TopNavbar() {
@@ -107,6 +108,16 @@ export function TopNavbar() {
                 </DropdownMenuLabel>
 
                 <DropdownMenuSeparator />
+
+                <DropdownMenuItem asChild>
+                  <Link
+                    href="/"
+                    className="flex items-center gap-2"
+                  >
+                    <RiHomeGearLine className="h-4 w-4" />
+                    Home
+                  </Link>
+                </DropdownMenuItem>
 
                 <DropdownMenuItem asChild>
                   <Link
